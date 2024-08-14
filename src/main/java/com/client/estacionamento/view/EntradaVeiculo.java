@@ -1,15 +1,14 @@
 package com.client.estacionamento.view;
 
-import com.app.estacionamento.controller.CarrroController;
-import com.app.estacionamento.controller.EntradaController;
-import com.app.estacionamento.entity.Carro;
-import com.app.estacionamento.entity.Entrada;
-import com.app.estacionamento.entity.form.CarroForm;
-import com.app.estacionamento.entity.form.EntradaForm;
+
+
+import com.client.estacionamento.model.Carro;
+import com.client.estacionamento.service.CarroService;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
 
 
 public class EntradaVeiculo extends JFrame{
@@ -18,15 +17,8 @@ public class EntradaVeiculo extends JFrame{
     private JTextField placa;
     private JButton entradaButton;
 
-    private final CarrroController carroController;
-    private final EntradaController entradaController;
+    public EntradaVeiculo() {
 
-
-    public EntradaVeiculo(CarrroController carroController, EntradaController entradaController) {
-        this.carroController = carroController;
-        this.entradaController = entradaController;
-
-        // Configuração dos componentes da interface gráfica
         initUI();
     }
 
@@ -45,7 +37,13 @@ public class EntradaVeiculo extends JFrame{
         entradaButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                handleEntrada();
+                try {
+                    handleEntrada();
+                } catch (IOException ex) {
+                    throw new RuntimeException(ex);
+                } catch (InterruptedException ex) {
+                    throw new RuntimeException(ex);
+                }
             }
         });
 
@@ -55,19 +53,16 @@ public class EntradaVeiculo extends JFrame{
         setLocationRelativeTo(null);
     }
 
-    private void handleEntrada() {
-        CarroForm carroForm = new CarroForm();
-        EntradaForm entradaForm = new EntradaForm();
+    private void handleEntrada() throws IOException, InterruptedException {
+        CarroService carroService = new CarroService();
+        Carro carro = new Carro();
+        carro.setPalca(placa.getText());
+        carro.setMarca(marca.getText());
+        carroService.createCarro(carro);
+        System.out.println("Carro registrado com sucesso");
 
-        carroForm.setMarca(marca.getText());
-        carroForm.setPlaca(placa.getText());
-
-        Carro carro = carroController.create(carroForm);
 
 
-        entradaForm.setCarroId(carro.getId());
-
-        Entrada entrada = entradaController.create(entradaForm);
 
         System.out.println("Entrada do veículo realizada");
     }
